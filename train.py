@@ -14,7 +14,7 @@ import torch.nn.functional as F
 
 from net.resnet50_cam import ResNet50_CAM
 from misc.utils import *
-from dataset.ClassificationDataset import CityClassificationDataset
+from dataset.ClassificationDataset import ClassificationDataset
 
 
 def validate(model, data_loader):
@@ -35,7 +35,8 @@ def validate(model, data_loader):
 
 
 def run():
-    data_path = r'F:\项目\ldh\my_CAM\city\images'
+    data_path_A = r'F:\project\ldh\my_CAM\city\images'
+    data_path_B = r'F:\project\ldh\my_CAM\gta5\images'
     save_model_path = 'sess/res50_cam.pth'
     batch_size = 8
     num_workers = 2
@@ -44,10 +45,10 @@ def run():
     weight_decay = 1e-4
     model = ResNet50_CAM()
 
-    train_dataset = CityClassificationDataset(image_path=data_path)
+    train_dataset = ClassificationDataset(data_path_A, data_path_B, split='train')
     train_data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True, drop_last=True)
 
-    val_dataset = CityClassificationDataset(image_path=data_path, split='val')
+    val_dataset = ClassificationDataset(data_path_A, data_path_B, split='val')
     val_data_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True, drop_last=True)
 
     max_step = (len(train_dataset) // batch_size) * num_epoches

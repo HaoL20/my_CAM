@@ -10,15 +10,18 @@ from torchvision import transforms
 
 class ClassificationDataset(Dataset):
     def __init__(self, image_path_A, image_path_B, split='train', random_mirror=True, num_class=4):
-        self.image_path_A = image_path_A
-        self.image_path_B = image_path_B
+
         self.random_mirror = random_mirror
         self.num_class = num_class
-        self.items_city = [i for i in open("city/{}_classification.txt".format(split))]
-        self.item_
+        list_A = [i for i in open("city/{}_classification.txt".format(split))]
+        list_B = [i for i in open("GTA5/{}_classification.txt".format(split))]
+        items_A = [os.path.join(image_path_A, i.strip('\n')) for i in list_A]
+        items_B = [os.path.join(image_path_B, i.strip('\n')) for i in list_B]
+        self.items = items_A + items_B
+
     def __getitem__(self, index):
         # 读取图片
-        name_str = os.path.join(self.image_path, self.items[index].strip('\n'))
+        name_str = self.items[index]
         image = Image.open(name_str).convert("RGB")
 
         # 随机翻转
@@ -47,9 +50,11 @@ class ClassificationDataset(Dataset):
 
 
 def main():
-    data_path = r'F:\项目\ldh\my_CAM\city\images'
-    data_set = CityClassificationDataset(data_path)
-    data_loader = DataLoader(data_set, batch_size=1)
+    data_path_A = r'F:\project\ldh\my_CAM\city\images'
+    data_path_B = r'F:\project\ldh\my_CAM\gta5\images'
+
+    data_set = ClassificationDataset(data_path_A, data_path_B)
+    data_loader = DataLoader(data_set, batch_size=1, shuffle=True)
 
     for idx, pack in enumerate(data_loader):
         images = pack['img']
